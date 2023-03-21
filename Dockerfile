@@ -2,6 +2,10 @@ FROM anapsix/alpine-java
 
 LABEL maintainer="quoc.pham@spiraledge.com"
 
-COPY /target/spring-petclinic-1.5.1.jar /home/spring-petclinic-1.5.1.jar
+# set a health check
+HEALTHCHECK --interval=5s \
+            --timeout=5s \
+            CMD curl -f http://127.0.0.1:8001 || exit 1
 
-CMD ["java","-jar","/home/spring-petclinic-1.5.1.jar"]
+# tell docker what port to expose
+EXPOSE 8001
