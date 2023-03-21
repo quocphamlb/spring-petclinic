@@ -2,22 +2,20 @@
 
 pipeline {
         def app
-  stages {
-  	stage('Maven Install') {
-    	agent {
-      	docker.withDockerContainer('maven:3.5.0') {
-    // some block
-        }
-      }
-      steps {
-      	sh 'mvn clean install'
-      }
+        
+        stage('Clone repository') {
+        /* Let's make sure we have the repository cloned to our workspace */
+
+        checkout scm
     }
-    stage('Docker Build') {
-      app = docker.build("quocphamlb/springpetclinic")
+        stage('Build image') {
+        /* This builds the actual image; synonymous to
+         * docker build on the command line */
+
+        app = docker.build("quocphamlb/springpetclinic")
     }
-         
-          stage('Test image') {
+        
+        stage('Test image') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
 
@@ -25,7 +23,8 @@ pipeline {
             sh 'echo "Tests passed"'
         }
     }
-          stage('Push image') {
+
+    stage('Push image') {
         /* Finally, we'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
@@ -35,5 +34,4 @@ pipeline {
             app.push("latest")
         }
     }
-  }
 }
